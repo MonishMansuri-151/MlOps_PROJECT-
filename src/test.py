@@ -3,7 +3,7 @@ from src.exception import CustomException
 
 def divide_number():
     a=10
-    b=5
+    b=0
     result =a/b 
     return result 
 

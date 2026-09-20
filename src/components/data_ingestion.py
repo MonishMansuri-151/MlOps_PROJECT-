@@ -35,9 +35,7 @@ class DataIngestion:
             train_set.to_csv(self.ingestion_config.train_data_path, index=False, header=True) 
             test_set.to_csv(self.ingestion_config.test_data_path, index=False, header=True) 
             logger.info("Data Ingestion completed successfully...")
-            logger.info("Jo log online class le rhe h , unko bhi congration , unka bhi data ingestion ho chuka h , leptop per apna hath rkh kr apne aap ko pawan kare.")
-            logger.info("----------")
-            logger.info("Jinka net nhi chl rha online me , unka bhi data ingestion complete")
+         
             return {
                 self.ingestion_config.train_data_path,
                 self.ingestion_config.test_data_path
