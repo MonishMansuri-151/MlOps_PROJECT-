@@ -1,0 +1,6 @@
+[2026-09-20 22:15:18,900] 40 main -INFO -Prediction request received :: age23, genderMale, fever139.0, coughStrong,cityBangalore
+[2026-09-20 22:15:18,900] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\main.py]at line number: [42]with error message: ['CustomData' object has no attribute 'get_Data_Frame']
+[2026-09-20 22:15:27,480] 22 main -INFO -Home page accessed...
+[2026-09-20 22:15:31,639] 27 main -INFO -Predict form page accessed.....
+[2026-09-20 22:15:53,947] 40 main -INFO -Prediction request received :: age54, genderFemale, fever103.0, coughStrong,cityKolkata
+[2026-09-20 22:15:53,957] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\main.py]at line number: [42]with error message: ['CustomData' object has no attribute 'get_Data_Frame']

@@ -1,0 +1,8 @@
+[2026-09-20 22:18:32,741] 40 main -INFO -Prediction request received :: age54, genderFemale, fever103.0, coughStrong,cityKolkata
+[2026-09-20 22:18:32,742] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-20 22:18:32,884] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\src\pipeline\predict_pipeline.py]at line number: [48]with error message: [only 0-dimensional arrays can be converted to Python scalars]
+[2026-09-20 22:18:32,884] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\main.py]at line number: [44]with error message: [Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\src\pipeline\predict_pipeline.py]at line number: [48]with error message: [only 0-dimensional arrays can be converted to Python scalars]]
+[2026-09-20 22:18:38,065] 40 main -INFO -Prediction request received :: age54, genderFemale, fever103.0, coughStrong,cityKolkata
+[2026-09-20 22:18:38,066] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-20 22:18:38,072] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\src\pipeline\predict_pipeline.py]at line number: [48]with error message: [only 0-dimensional arrays can be converted to Python scalars]
+[2026-09-20 22:18:38,073] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\main.py]at line number: [44]with error message: [Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\src\pipeline\predict_pipeline.py]at line number: [48]with error message: [only 0-dimensional arrays can be converted to Python scalars]]

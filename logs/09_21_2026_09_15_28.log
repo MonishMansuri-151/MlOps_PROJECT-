@@ -1,0 +1,19 @@
+[2026-09-21 09:16:39,069] 40 main -INFO -Prediction request received :: age60, genderMale, fever103.0, coughMild,cityKolkata
+[2026-09-21 09:16:39,070] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:16:39,485] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Negative, confidence_score = 100.0
+[2026-09-21 09:20:51,088] 40 main -INFO -Prediction request received :: age27, genderMale, fever100.0, coughMild,cityDelhi
+[2026-09-21 09:20:51,089] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:20:51,110] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Negative, confidence_score = 100.0
+[2026-09-21 09:25:24,929] 40 main -INFO -Prediction request received :: age27, genderMale, fever100.0, coughMild,cityDelhi
+[2026-09-21 09:25:24,930] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:25:24,939] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Negative, confidence_score = 100.0
+[2026-09-21 09:25:32,692] 40 main -INFO -Prediction request received :: age27, genderFemale, fever100.0, coughStrong,cityMumbai
+[2026-09-21 09:25:32,693] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:25:32,704] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Positive, confidence_score = 100.0
+[2026-09-21 09:26:34,769] 40 main -INFO -Prediction request received :: age27, genderFemale, fever100.0, coughStrong,cityMumbai
+[2026-09-21 09:26:34,770] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:26:34,779] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Positive, confidence_score = 100.0
+[2026-09-21 09:35:56,234] 40 main -INFO -Prediction request received :: age27, genderFemale, fever100.0, coughStrong,cityMumbai
+[2026-09-21 09:35:56,235] 37 src.pipeline.predict_pipeline -INFO -Loading Model and Preprocessor
+[2026-09-21 09:35:56,244] 55 src.pipeline.predict_pipeline -INFO -Prediction completed: Positive, confidence_score = 100.0
+[2026-09-21 09:35:56,262] 20 src.exception -ERROR -Error occured in python script: [C:\Users\ss\Desktop\ML_Workshope_project\main.py]at line number: [45]with error message: [Encountered unknown tag 'comment'.]
