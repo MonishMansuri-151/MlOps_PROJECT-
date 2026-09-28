@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sanjivni AI Assistant</title>
+
+    <link rel="stylesheet" href="/chatbot/static/chatbot.css">
+</head>
+
+<body>
+
+<div class="chat-app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <div class="brand">
+                <div class="brand-icon">🏥</div>
+
+                <div>
+                    <h2>Sanjivni</h2>
+                    <span>AI Health Assistant</span>
+                </div>
+            </div>
+
+            <button
+                class="close-sidebar"
+                id="closeSidebarBtn"
+            >
+                ×
+            </button>
+        </div>
+
+
+        <!-- New Chat -->
+        <button
+            class="new-chat-btn"
+            id="newChatBtn"
+        >
+            <span>＋</span>
+            <span>New Chat</span>
+        </button>
+
+
+        <!-- Chat History -->
+        <div class="history-container">
+
+            <div class="history-section">
+
+                <h4>Today</h4>
+
+                <div
+                    id="todayChats"
+                    class="chat-list"
+                >
+                </div>
+
+            </div>
+
+
+            <div class="history-section">
+
+                <h4>Yesterday</h4>
+
+                <div
+                    id="yesterdayChats"
+                    class="chat-list"
+                >
+                </div>
+
+            </div>
+
+
+            <div class="history-section">
+
+                <h4>Older</h4>
+
+                <div
+                    id="olderChats"
+                    class="chat-list"
+                >
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+
+            <div class="retention-info">
+                🕒 Chats are automatically deleted
+                after 20 days of inactivity.
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Main Chat -->
+    <main class="chat-main">
+
+        <!-- Header -->
+        <header class="chat-header">
+
+            <button
+                class="menu-btn"
+                id="menuBtn"
+            >
+                ☰
+            </button>
+
+            <div class="header-info">
+
+                <div class="assistant-avatar">
+                    🏥
+                </div>
+
+                <div>
+                    <h3>Sanjivni AI</h3>
+
+                    <span class="online-status">
+                        ● Online
+                    </span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- Messages -->
+        <section
+            class="messages-container"
+            id="messagesContainer"
+        >
+
+            <div
+                class="welcome-screen"
+                id="welcomeScreen"
+            >
+
+                <div class="welcome-icon">
+                    🏥
+                </div>
+
+                <h1>
+                    Welcome to Sanjivni Clinic
+                </h1>
+
+                <p>
+                    Tell me about your health concern,
+                    and I can help you find the relevant
+                    department and doctor.
+                </p>
+
+                <div class="suggestion-container">
+
+                    <button class="suggestion">
+                        I have a skin problem
+                    </button>
+
+                    <button class="suggestion">
+                        I have chest pain
+                    </button>
+
+                    <button class="suggestion">
+                        I need an orthopedic doctor
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Input -->
+        <div class="input-area">
+
+            <div class="input-wrapper">
+
+                <textarea
+                    id="messageInput"
+                    rows="1"
+                    placeholder="Describe your health concern..."
+                ></textarea>
+
+                <button
+                    id="sendBtn"
+                    class="send-btn"
+                    title="Send"
+                >
+                    ➤
+                </button>
+
+            </div>
+
+            <p class="medical-disclaimer">
+                Sanjivni AI provides general health guidance
+                and does not replace a qualified doctor.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="/chatbot/static/chatbot.js"></script>
+
+</body>
+</html>

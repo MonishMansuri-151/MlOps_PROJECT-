@@ -1,18 +1,98 @@
-import os 
-import sys 
-import uvicorn 
-from fastapi import FastAPI, Form, Request 
+import os
+import sys
+import uvicorn
+from chatbot.router.injury import router as injury_router
+from contextlib import asynccontextmanager
+from chatbot.router.admin_analytics import router as admin_analytics_router
+from fastapi import APIRouter, HTTPException
+from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles 
-from fastapi.templating import Jinja2Templates 
-from src.exception import CustomException 
-from src.logger import get_logger 
-logger = get_logger(__name__) 
-from src.pipeline.predict_pipeline import CustomData, PredictPipeline
-app= FastAPI(title="Covid Prediction Clinic") 
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 
-##mouting the css file 
-app.mount("/static", StaticFiles(directory="static"), name="static") 
+from src.exception import CustomException
+from src.logger import get_logger
+logger = get_logger(__name__)
+
+from src.pipeline.predict_pipeline import CustomData, PredictPipeline
+
+from nlp_pretrained.ner_tagger import (
+    get_pos_tags,
+    extract_entities
+)
+
+from nlp_pretrained.embedding import (
+    most_similar_words
+)
+
+from nlp_pretrained.sentiment_analyzer import (
+    analyze_sentiment
+)
+
+# Chatbot routers
+from chatbot.router.chat import router as chatbot_router
+from chatbot.auth.router import router as auth_router
+
+# Chat history cleanup
+from chatbot.database.queries import delete_expired_chat_sessions
+from chatbot.router.medical import router as medical_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        deleted = delete_expired_chat_sessions(20)
+
+        logger.info(
+            f"Chat history cleanup completed. "
+            f"Deleted sessions: {deleted}"
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Chat history cleanup failed: {e}"
+        )
+
+    yield
+
+
+app = FastAPI(
+    title="Covid Prediction Clinic",
+    lifespan=lifespan
+)
+
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="change-this-secret-key"
+)
+
+
+# Chatbot router
+app.include_router(chatbot_router)
+# Authentication router
+app.include_router(auth_router)
+# medical router 
+app.include_router(medical_router)
+# injury router added
+app.include_router(injury_router)
+# add admin analytics file router 
+app.include_router(admin_analytics_router)
+
+# Existing static files
+app.mount(
+    "/static",
+    StaticFiles(directory="static"),
+    name="static"
+)
+
+
+# Chatbot frontend static files
+app.mount(
+    "/chatbot/static",
+    StaticFiles(directory="chatbot/frontend"),
+    name="chatbot_static"
+)
 
 ##Set the template folder 
 templates = Jinja2Templates(directory="templates") 
@@ -64,6 +144,103 @@ async def predict_result(
 async def health_check():
     logger.info("Monitering alert....")
     return {"status":"ok"}
+
+## nlp (netural language processing ..................................)
+
+
+
+### NLP Pretrained 
+
+@app.get("/pretrained-nlp" , response_class=HTMLResponse) 
+async def pretrained_nlp_form(request: Request):
+    return templates.TemplateResponse(request, 
+                                      "pretrained_nlp.html",
+                                      {
+                                          "result": None,
+
+                                          "form_data": {
+                                              "query": ""
+                                          },
+                                          "error": None 
+                                      })
+
+@app.post("/pretrained-nlp" , response_class=HTMLResponse) 
+async def pretrained_nlp_analysis(
+    request: Request,
+    query: str= Form(...)
+):
+    try:
+        ## text clean 
+        query = query.strip() 
+        if not query:
+            return templates.TemplateResponse(
+                request,
+                "pretrained_nlp.html",
+                {
+                    "result": None,
+                    "form_data": {
+                        "query": ""
+                    },
+                    "error": "Please enter some text..." 
+                }
+            )
+
+        ## Pos tagging 
+        pos_tags = get_pos_tags(query) 
+
+        ## NER 
+        entities = extract_entities(query) 
+
+        ## Sentiment Analysis 
+        sentiment = analyze_sentiment(query) 
+
+        ## Word Embeddings 
+        similar_words = [] 
+        words = query.split() 
+        first_word = words[0].lower() 
+        if words:
+            try:
+                similar_words = most_similar_words(first_word , topn=5) 
+            except Exception as e :
+                logger.warning(f"Glove similarity failed for: " , {first_word} ,"and the error is:", {e}) 
+                similar_words = [] 
+        ## final result 
+        result = {
+            "query": query,
+            "pos_tags": pos_tags,
+            "entities": entities,
+            "similar_words": similar_words,
+            "sentiment": sentiment
+        }
+        ##render result 
+        return templates.TemplateResponse(
+            request,
+            "pretrained_nlp.html",
+            {
+                "result": result,
+                "form_data": {
+                    "query": query
+                },
+                "error": None
+            }
+        )
+
+
+
+    except Exception as e :
+        logger.info("Error occured in pretrained nlp analysis")
+        return templates.TemplateResponse(
+            request,
+            "pretrained_nlp.html",
+            {
+                "result": None,
+                "form_data": {
+                    "query": query
+                },
+                "error": str(e)
+            }
+        )
+     
 
 
 if __name__ == "__main__":

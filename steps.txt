@@ -46,3 +46,255 @@ ner_tagger
 embeddings
 
 sentiment_analy
+
+SANJEEVANI CLINIC
+CHATBOT + K-MEANS PROJECT NOTES
+================================
+
+1. PROJECT FLOW
+----------------
+
+Homepage
+   ↓
+static/chatbot/chatbot.js
+   ↓
+FastAPI main.py
+   ↓
+Chatbot APIs
+   ↓
+MySQL Database
+
+
+2. CHATBOT
+-----------
+
+chatbot/
+    auth/
+    database/
+    router/
+    services/
+    ai/
+    frontend/
+
+Chatbot का काम:
+- Patient registration
+- Patient login
+- Admin login
+- Doctor information
+- Departments
+- Doctor schedules
+- Available slots
+- Appointment
+- Chat
+- Chat history
+- Medical files
+- Injury analysis
+
+
+3. DATABASE
+-----------
+
+chatbot/database/connection.py
+    → MySQL connection बनाता है.
+
+chatbot/database/queries.py
+    → Database से data पढ़ने और save करने के functions.
+
+
+4. AUTHENTICATION
+-----------------
+
+chatbot/auth/authentication.py
+    → Patient/Admin login verify करता है.
+
+chatbot/auth/session.py
+    → Login session maintain करता है.
+
+chatbot/auth/admin.py
+    → Admin access check करता है.
+
+chatbot/auth/router.py
+    → Login/Register/Logout APIs.
+
+
+5. CHATBOT FRONTEND
+-------------------
+
+static/chatbot/chatbot.js
+
+ये homepage पर चलने वाला actual chatbot frontend है.
+
+इसका काम:
+- Chatbot button
+- Chat window
+- Login
+- Registration
+- Chat messages
+- Quick actions
+- Logout
+
+Homepage में इसे इस तरह load किया गया:
+
+<script src="/static/chatbot/chatbot.js"></script>
+
+
+6. CHAT ROUTER
+--------------
+
+chatbot/router/chat.py
+
+Chatbot messages और chat-related APIs.
+
+
+7. DOCTOR ROUTER
+----------------
+
+chatbot/router/doctors.py
+
+Doctor:
+- List
+- Details
+- Schedule
+- Slots
+
+
+8. APPOINTMENT ROUTER
+---------------------
+
+chatbot/router/appointments.py
+
+Appointment booking से related APIs.
+
+
+9. MEDICAL
+----------
+
+chatbot/router/medical.py
+
+Medical file upload और report analysis endpoints.
+
+
+10. INJURY
+----------
+
+chatbot/router/injury.py
+
+Injury analysis और injury booking.
+
+
+11. K-MEANS
+-----------
+
+kmeans/
+
+data_loader.py
+    → Database से analytics data.
+
+preprocessing.py
+    → Data को K-Means के लिए prepare करता है.
+
+clustering.py
+    → K-Means algorithm run करता है.
+
+evaluation.py
+    → Clustering evaluation.
+
+visualization.py
+    → Visualization.
+
+config.py
+    → K-Means configuration.
+
+analytics_service.py
+    → Analytics result service.
+
+
+12. ADMIN ANALYTICS
+-------------------
+
+/admin/analytics/dashboard
+
+/admin/analytics/department-demand
+
+Admin dashboard में appointment और department analytics दिखाई जाती है.
+
+
+13. IMPORTANT DATABASE TABLES
+-----------------------------
+
+patients
+departments
+doctors
+doctor_schedules
+appointments
+medical_history
+chat_sessions
+chat_messages
+medical_images
+admin_users
+
+
+14. ADMIN USERS
+--------------
+
+admin_users table:
+- admin
+- super_admin
+
+Patients और admins अलग tables में रखे गए हैं.
+
+
+15. TESTING DONE
+----------------
+
+✓ Patient registration
+✓ Patient login
+✓ Homepage chatbot
+✓ Chatbot message
+✓ Backend connection
+
+
+16. FINAL TESTING
+-----------------
+
+बाकी verify करना है:
+
+- Appointment complete flow
+- Available slots
+- Appointment creation
+- Patient appointments
+- Chat history
+- Medical upload
+- Medical analysis
+- Injury analysis
+- Injury booking
+- Admin analytics
+- K-Means
+- Final UI
+- Logout/session behavior
+
+
+17. GITHUB
+----------
+
+GitHub पर push करने से पहले:
+
+.env
+.venv312
+__pycache__
+logs
+
+push नहीं होने चाहिए.
+
+Commands:
+
+git init
+git add .
+git status
+git commit -m "Add Sanjeevani chatbot and K-Means analytics"
+
+फिर GitHub repository connect करके:
+
+git branch -M main
+git remote add origin YOUR_GITHUB_REPOSITORY_URL
+git push -u origin main

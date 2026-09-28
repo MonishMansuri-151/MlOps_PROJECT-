@@ -3,8 +3,6 @@
 # combine the np.c arrry to to export the pkl using utils.py save_object file 
 # return path pkl and train_arr and test_arr 
 
-
-
 import os 
 import sys 
 import pandas as pd 

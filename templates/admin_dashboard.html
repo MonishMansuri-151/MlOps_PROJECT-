@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sanjivni Clinic - Admin Analytics</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-title {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .card-value {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f9fafb;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .error {
+            color: #b91c1c;
+            padding: 15px;
+            background: #fee2e2;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Admin Analytics Dashboard</h1>
+
+    <div class="subtitle">
+        Sanjivni Clinic — Department Appointment Analytics
+    </div>
+
+    <div id="errorBox"></div>
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="card-title">
+                Total Appointments
+            </div>
+
+            <div
+                class="card-value"
+                id="totalAppointments"
+            >
+                -
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                Departments
+            </div>
+
+            <div
+                class="card-value"
+                id="departmentCount"
+            >
+                -
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                Clusters
+            </div>
+
+            <div
+                class="card-value"
+                id="clusterCount"
+            >
+                -
+            </div>
+        </div>
+
+    </div>
+
+    <div class="chart-card">
+
+        <h2>Department Appointment Demand</h2>
+
+        <div class="chart-wrapper">
+            <canvas id="demandChart"></canvas>
+        </div>
+
+    </div>
+
+    <div class="chart-card">
+
+        <h2>Cluster Details</h2>
+
+        <div id="tableContainer">
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let demandChart = null;
+
+
+async function loadAnalytics() {
+
+    const errorBox =
+        document.getElementById("errorBox");
+
+    errorBox.innerHTML = "";
+
+    try {
+
+        const response = await fetch(
+            "/admin/analytics/department-demand",
+            {
+                method: "GET",
+                credentials: "same-origin"
+            }
+        );
+
+        if (response.status === 401) {
+            window.location.href = "/";
+            return;
+        }
+
+        if (response.status === 403) {
+            throw new Error(
+                "You do not have permission to access this dashboard."
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to load analytics."
+            );
+        }
+
+        const data = await response.json();
+
+        renderSummary(data);
+        renderChart(data.clusters);
+        renderTable(data.clusters);
+
+    } catch (error) {
+
+        errorBox.innerHTML = `
+            <div class="error">
+                ${error.message}
+            </div>
+        `;
+    }
+}
+
+
+function renderSummary(data) {
+
+    document.getElementById(
+        "totalAppointments"
+    ).textContent = data.total_appointments;
+
+    document.getElementById(
+        "departmentCount"
+    ).textContent = data.department_count;
+
+    const clusters = new Set(
+        data.clusters.map(item => item.cluster)
+    );
+
+    document.getElementById(
+        "clusterCount"
+    ).textContent = clusters.size;
+}
+
+
+function renderChart(clusters) {
+
+    const labels = clusters.map(
+        item => item.department_name
+    );
+
+    const values = clusters.map(
+        item => item.appointment_count
+    );
+
+    const canvas =
+        document.getElementById("demandChart");
+
+    if (demandChart) {
+        demandChart.destroy();
+    }
+
+    demandChart = new Chart(
+        canvas,
+        {
+            type: "bar",
+
+            data: {
+                labels: labels,
+
+                datasets: [
+                    {
+                        label: "Appointments",
+                        data: values
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+
+function renderTable(clusters) {
+
+    const container =
+        document.getElementById(
+            "tableContainer"
+        );
+
+    if (!clusters.length) {
+        container.innerHTML =
+            "<p>No analytics data available.</p>";
+
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Appointments</th>
+                    <th>Cluster</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    clusters.forEach(item => {
+
+        html += `
+            <tr>
+                <td>${item.department_name}</td>
+
+                <td>
+                    ${item.appointment_count}
+                </td>
+
+                <td>
+                    <span class="status">
+                        Cluster ${item.cluster}
+                    </span>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = html;
+}
+
+
+loadAnalytics();
+
+</script>
+
+</body>
+</html>

@@ -8,8 +8,8 @@ REQUIRED_RESOURCES = [
     "punkt_tab",  ## This is newer version of tokenization 
     "averaged_perceptron_tagger", ## This is used for POS-TAGGING
     "averaged_perceptron_tagger_eng" , ##This is newer version of POS-TAGGER 
-    "maxnet_ne_chunker" , ## THIS IS FOR NER(NAMED ENTITY RECOGNITION) 
-    "maxnet_ne_chunker_tab", ## This is newer version of NER
+    "maxent_ne_chunker" , ## THIS IS FOR NER(NAMED ENTITY RECOGNITION) 
+    "maxent_ne_chunker_tab", ## This is newer version of NER
     "words", ## this is used for convert our word into Lexical format . 
     "vader_lexicon",## This is is used for sentiment analysis(text = positive , negative , neutral) 
     "stopwords" , ## it will provide common stopword list[the, is. a, an ,of ,and] 
