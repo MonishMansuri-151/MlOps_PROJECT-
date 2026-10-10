@@ -1,0 +1,218 @@
+
+<!-- Sanjivni AI Chatbot Widget -->
+<div id="sanjivni-chatbot" class="sanjivni-chatbot">
+
+    <!-- Floating launcher button -->
+    <button
+        id="sanjivni-chat-toggle"
+        class="sanjivni-chat-toggle"
+        type="button"
+        aria-label="Open Sanjivni AI Assistant"
+        aria-expanded="false"
+        aria-controls="sanjivni-chat-window"
+    >
+        <svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8
+            8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9
+            L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8
+            8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5
+            a8.5 8.5 0 0 1 8 8v.5z"/>
+        </svg>
+        <span class="chat-toggle-label">Chat with us</span>
+        <span class="chat-notification-dot" aria-hidden="true"></span>
+    </button>
+
+    <!-- Chat window -->
+    <section
+        id="sanjivni-chat-window"
+        class="sanjivni-chat-window"
+        aria-label="Sanjivni AI Assistant"
+        aria-hidden="true"
+        hidden
+    >
+        <!-- Header -->
+        <header class="sanjivni-chat-header">
+            <div class="chat-brand">
+                <div class="chat-brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3v18M3 12h18"/>
+                        <circle cx="12" cy="12" r="9"/>
+                    </svg>
+                </div>
+
+                <div class="chat-brand-info">
+                    <h2>Sanjivni Assistant</h2>
+                    <p>
+                        <span class="chat-online-indicator"></span>
+                        Your healthcare companion
+                    </p>
+                </div>
+            </div>
+
+            <div class="chat-header-actions">
+                <button
+                    id="sanjivni-chat-minimize"
+                    class="chat-header-btn"
+                    type="button"
+                    aria-label="Minimize chat"
+                    title="Minimize"
+                >−</button>
+
+                <button
+                    id="sanjivni-chat-close"
+                    class="chat-header-btn"
+                    type="button"
+                    aria-label="Close chat"
+                    title="Close"
+                >×</button>
+            </div>
+        </header>
+                <!-- Authentication panel -->
+        <section id="sanjivni-auth-panel" class="sanjivni-auth-panel">
+            <div id="sanjivni-auth-status" role="status">
+                Checking login status...
+            </div>
+
+            <div id="sanjivni-auth-actions" hidden>
+                <button type="button" id="sanjivni-show-login">Login</button>
+                <button type="button" id="sanjivni-show-register">Register</button>
+            </div>
+
+            <form id="sanjivni-login-form" hidden>
+                <h3>Patient Login</h3>
+                <label for="sanjivni-login-identifier">Phone or email</label>
+                <input id="sanjivni-login-identifier" name="identifier"
+                       required maxlength="255" autocomplete="username">
+
+                <label for="sanjivni-login-password">Password</label>
+                <input id="sanjivni-login-password" name="password"
+                       type="password" required maxlength="128"
+                       autocomplete="current-password">
+
+                <button type="submit">Login</button>
+                <button type="button" id="sanjivni-login-cancel">Back</button>
+            </form>
+
+            <form id="sanjivni-register-form" hidden>
+                <h3>Create Patient Account</h3>
+
+                <label for="sanjivni-reg-name">Full name</label>
+                <input id="sanjivni-reg-name" name="name" required
+                       minlength="2" maxlength="100" autocomplete="name">
+
+                <label for="sanjivni-reg-phone">Phone</label>
+                <input id="sanjivni-reg-phone" name="phone" type="tel"
+                       required minlength="10" maxlength="20" autocomplete="tel">
+
+                <label for="sanjivni-reg-email">Email</label>
+                <input id="sanjivni-reg-email" name="email" type="email"
+                       required maxlength="255" autocomplete="email">
+
+                <label for="sanjivni-reg-password">Password (minimum 8 characters)</label>
+                <input id="sanjivni-reg-password" name="password" type="password"
+                       required minlength="8" maxlength="72"
+                       autocomplete="new-password">
+
+                <label for="sanjivni-reg-dob">Date of birth</label>
+                <input id="sanjivni-reg-dob" name="dob" type="date" required>
+
+                <label for="sanjivni-reg-gender">Gender</label>
+                <select id="sanjivni-reg-gender" name="gender" required>
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <label for="sanjivni-reg-address">Address</label>
+                <textarea id="sanjivni-reg-address" name="address"
+                          required minlength="5" maxlength="500"></textarea>
+
+                <button type="submit">Create account</button>
+                <button type="button" id="sanjivni-register-cancel">Back</button>
+            </form>
+
+            <button type="button" id="sanjivni-logout" hidden>Logout</button>
+            <p id="sanjivni-auth-error" role="alert" aria-live="polite"></p>
+        </section>
+
+        <!-- Messages -->
+
+        <div
+            id="sanjivni-chat-messages"
+            class="sanjivni-chat-messages"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+        >
+            <div class="chat-date-label">WELCOME TO SANJIVNI</div>
+
+            <div class="chat-message assistant-message">
+                <div class="message-avatar" aria-hidden="true">S</div>
+                <div class="message-content">
+                    <p class="message-sender">Sanjivni Assistant</p>
+                    <div class="message-bubble">
+                        <p>Namaste! 👋 Welcome to Sanjivni.</p>
+                        <p>
+                            I can help you explore doctors, appointments
+                            and general health information. How can I
+                            help you today?
+                        </p>
+                    </div>
+                    <span class="message-time">Just now</span>
+                </div>
+            </div>
+
+            <!-- JavaScript adds new messages here -->
+        </div>
+
+        <!-- Suggested prompts -->
+        <div class="chat-suggestions" id="sanjivni-chat-suggestions">
+            <button type="button" data-message="Show me available doctors">
+                <span aria-hidden="true">🩺</span> Find a doctor
+            </button>
+
+            <button type="button" data-message="I want to book an appointment">
+                <span aria-hidden="true">📅</span> Book appointment
+            </button>
+
+            <button type="button" data-message="Tell me about your services">
+                <span aria-hidden="true">💚</span> Our services
+            </button>
+        </div>
+
+        <!-- Message form -->
+        <form id="sanjivni-chat-form" class="sanjivni-chat-form">
+            <label class="sr-only" for="sanjivni-chat-input">
+                Type your message
+            </label>
+
+            <textarea
+                id="sanjivni-chat-input"
+                name="message"
+                placeholder="Ask me anything..."
+                rows="1"
+                maxlength="8000"
+                required
+            ></textarea>
+
+            <button
+                id="sanjivni-chat-send"
+                class="chat-send-btn"
+                type="submit"
+                aria-label="Send message"
+                title="Send message"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M22 2 11 13"/>
+                    <path d="m22 2-7 20-4-9-9-4Z"/>
+                </svg>
+            </button>
+        </form>
+
+        <footer class="sanjivni-chat-footer">
+            <span>Powered by Sanjivni AI</span>
+            <span>For emergencies, seek immediate medical care.</span>
+        </footer>
+    </section>
+</div>

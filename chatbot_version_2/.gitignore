@@ -1,0 +1,135 @@
+# ==============================
+# Environment / Secrets
+# ==============================
+
+.env
+.env.*
+!.env.example
+
+
+# ==============================
+# Python
+# ==============================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.pyo
+*.pyd
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.python-version
+
+
+# ==============================
+# Virtual Environment
+# ==============================
+
+venv/
+.venv/
+env/
+ENV/
+
+
+# ==============================
+# IDE / Editor
+# ==============================
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+
+
+# ==============================
+# OS Generated Files
+# ==============================
+
+.DS_Store
+Thumbs.db
+
+
+# ==============================
+# Logs
+# ==============================
+
+*.log
+logs/
+
+
+# ==============================
+# Uploaded Medical Files
+# ==============================
+
+uploads/*
+!uploads/.gitkeep
+
+
+# ==============================
+# Backup Files
+# ==============================
+
+backup/*
+!backup/.gitkeep
+
+
+# ==============================
+# Database / Local Data
+# ==============================
+
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+
+
+# ==============================
+# Temporary Files
+# ==============================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+
+
+# ==============================
+# Coverage / Testing
+# ==============================
+
+.coverage
+htmlcov/
+coverage.xml
+
+
+# ==============================
+# Build / Distribution
+# ==============================
+
+build/
+dist/
+*.egg-info/
+
+
+# ==============================
+# Jupyter
+# ==============================
+
+.ipynb_checkpoints/
+
+
+# ==============================
+# ML / Generated Artifacts
+# ==============================
+
+*.pkl
+*.joblib
+
+# Keep this commented unless your project
+# generates large local model files.
+# models/s

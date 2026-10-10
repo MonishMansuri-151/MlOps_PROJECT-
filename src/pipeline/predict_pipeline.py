@@ -59,47 +59,7 @@ class PredictPipeline:
 
 
 
-# class CustomData:
-#     def __init__(self,age:int, gender: str , fever:float , cough : str , city:str):
-#         self.age = age 
-#         self.gender = gender
-#         self.fever = fever
-#         self.cough = cough
-#         self.city = city 
-#     def get_Data_Frame(self):
-#         try:
-#             custom_Data_Frame ={
-#                 "age":[self.age],
-#                 "gender":[self.gender],
-#                 "fever":[self.fever],
-#                 "cough": [self.cough],
-#                 "city": [self.city]
-#             }
-#             return pd.DataFrame(custom_Data_Frame)
-#         except Exception as e :
-#             raise CustomException(e,sys)
-        
-# class PredictPipeline:
-#     def __init__(self):
-#          self.model_path = os.path.join('artifacts','model.pkl')
-#          self.preprocessor_path = os.path.join('artifacts','preprocessor.pkl')
-#     def predict(self,features: pd.DataFrame):
-#         try:
-#             model = load_object(self.model_path)
-#             preprocessor = load_object(self.preprocessor_path)
-#             logger.info ("model.pkl and preprocessor.pkl both are loaded .....")
-            
-#             data_scale = preprocessor.transform(features)
-#             prediction = model.predict(data_scale)
-            
-#             probability = None
-#             if hasattr(model,"predict_proba"):
-#                 probability = round(max(model.predict_proba(data_scale)[0])*100,2)
-#             result = "Positive" if  int(prediction[0]) == 1 else "Negetive"
-#             logger.info(f"Prediction completed : -> {result} confidence_score {probability}")
-#             return result,probability
-#         except Exception as e :
-#             raise CustomException(e,sys)
+
         
             
         
