@@ -1,11 +1,16 @@
+import os
 from pathlib import Path
 
-from src.logger import get_logger
-logger = get_logger(__name__)
 from database.connection import get_db
+from src.logger import get_logger
 
+logger = get_logger(__name__)
 
-UPLOAD_DIR = Path("uploads").resolve()
+# Uploaded medical files live in  <project>/uploads  (or UPLOAD_DIR from .env),
+# NOT in the current working directory - so the app behaves the same no matter
+# where it is started from.
+_PROJECT_DIR = Path(__file__).resolve().parents[1]
+UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR") or (_PROJECT_DIR / "uploads")).resolve()
 
 
 def get_patient_medical_history(patient_id: int):
@@ -351,4 +356,78 @@ def delete_medical_image(patient_id: int, image_id: int):
     return {
         "success": True,
         "message": "Medical file deleted successfully.",
+    }
+
+
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".pdf"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+
+def save_medical_file(
+    patient_id: int,
+    original_filename: str,
+    file_content: bytes,
+    chat_session_id: int | None = None,
+):
+    """
+    Save an uploaded medical file securely and register it in medical_images.
+    """
+    if not patient_id or patient_id <= 0:
+        return {"success": False, "message": "Valid patient ID is required."}
+
+    if not original_filename:
+        return {"success": False, "message": "Filename is required."}
+
+    ext = Path(original_filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return {
+            "success": False,
+            "message": "Only JPG, JPEG, PNG, and PDF files are allowed.",
+        }
+
+    if not file_content:
+        return {"success": False, "message": "Uploaded file is empty."}
+
+    if len(file_content) > MAX_FILE_SIZE:
+        return {"success": False, "message": "File size must not exceed 5 MB."}
+
+    import uuid
+    stored_filename = f"{uuid.uuid4().hex}{ext}"
+    patient_folder = UPLOAD_DIR / str(patient_id)
+    patient_folder.mkdir(parents=True, exist_ok=True)
+    destination = patient_folder / stored_filename
+
+    with open(destination, "wb") as f:
+        f.write(file_content)
+
+    # Store relative path in DB for cross-environment portability
+    rel_path = f"{patient_id}/{stored_filename}"
+
+    with get_db() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO medical_images (patient_id, chat_session_id, file_path)
+                VALUES (%s, %s, %s)
+                """,
+                (patient_id, chat_session_id, rel_path),
+            )
+            image_id = cursor.lastrowid
+
+    logger.info(
+        "Medical file saved successfully",
+        extra={
+            "event": "MEDICAL_FILE_UPLOADED",
+            "patient_id": patient_id,
+            "image_id": image_id,
+            "file_name": original_filename,
+        },
+    )
+
+    return {
+        "success": True,
+        "message": f"Medical document '{original_filename}' uploaded successfully.",
+        "image_id": image_id,
+        "file_name": original_filename,
+        "stored_file": stored_filename,
     }

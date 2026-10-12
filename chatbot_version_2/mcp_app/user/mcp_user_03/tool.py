@@ -79,6 +79,9 @@ def create_appointment(
             "message": "Invalid department.",
         }
 
+    if reason is not None:
+        reason = str(reason).strip()[:500] or None
+
     return book_appointment(
         patient_id=patient_id,
         doctor_id=doctor_id,

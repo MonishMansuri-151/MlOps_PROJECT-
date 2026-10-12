@@ -1,18 +1,15 @@
-fastapi
-uvicorn
-jinja2
-python-multipart
-itsdangerous
-python-dotenv
-pymysql
-bcrypt
-groq
-pandas
-numpy
-scikit-learn
-matplotlib
-pypdf
-pillow
-scipy
-joblib
-requests
+# Sanjivni backend (chatbot_version_2)
+fastapi>=0.110
+uvicorn>=0.29
+starlette>=0.37
+pydantic>=2.6
+itsdangerous>=2.1        # signed session cookies
+python-dotenv>=1.0
+PyMySQL>=1.1
+bcrypt>=4.1
+groq>=0.9
+mcp>=1.2,<2              # v2 renamed FastMCP and breaks mcp_app/server.py
+
+# only for running the tests
+pytest>=8
+httpx>=0.27

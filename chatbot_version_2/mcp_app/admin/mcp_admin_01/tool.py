@@ -1,6 +1,6 @@
 from database.connection import get_db
 from src.logger import get_logger
-logger = get_logger()
+logger = get_logger(__name__)
 
 MCP_NAME = "mcp_admin_01"
 MCP_DESCRIPTION = "Allow authorized admins to view patient information."
@@ -97,7 +97,7 @@ def search_patients(search: str | None = None):
                        OR phone LIKE %s
                        OR email LIKE %s
                     ORDER BY name
-                    LIMIT 100
+                    LIMIT 25
                     """,
                     (
                         search_value,
@@ -120,7 +120,7 @@ def search_patients(search: str | None = None):
                         created_at
                     FROM patients
                     ORDER BY name
-                    LIMIT 100
+                    LIMIT 25
                     """
                 )
 

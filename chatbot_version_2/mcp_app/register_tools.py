@@ -1,10 +1,10 @@
 
+import threading
 from functools import wraps
 
 from src.logger import get_logger
 from mcp_app.server import mcp_server
-from mcp_app.registry import register_mcp
-from mcp_app.permissions import can_execute_mcp
+from mcp_app.registry import MCP_REGISTRY, register_mcp
 
 from mcp_app.user.mcp_user_01.tool import get_patient_information
 from mcp_app.user.mcp_user_02.tool import get_doctors
@@ -180,53 +180,57 @@ TOOLS = [
 ]
 
 
-def register_all_tools():
-    registered_count = 0
+_lock = threading.Lock()
 
-    for name, handler, description, role, permission in TOOLS:
-        # Keep the original handler and its permission metadata.
-        register_mcp(
-            name=name,
-            handler=handler,
-            description=description,
-            role=role,
-            permission=permission,
-        )
 
-        def make_guarded_handler(
+def _make_guarded_handler(tool_name, original_handler):
+    @wraps(original_handler)
+    def guarded_handler(*args, **kwargs):
+        # Direct stdio calls have no trusted application identity.
+        # Fail closed; do not bypass authorization.
+        logger.warning(
+            "Blocked direct MCP call without trusted identity: %s",
             tool_name,
-            original_handler,
-            required_role,
-            required_permission,
-        ):
-            @wraps(original_handler)
-            def guarded_handler(*args, **kwargs):
-                # Direct stdio calls have no trusted application identity.
-                # Fail closed; do not bypass authorization.
-                logger.warning(
-                    "Blocked direct MCP call without trusted identity: %s",
-                    tool_name,
-                )
-                raise PermissionError(
-                    "Authentication required. Use the authenticated "
-                    "application API to execute this tool."
-                )
-
-            return guarded_handler
-
-        guarded_handler = make_guarded_handler(
-            name,
-            handler,
-            role,
-            permission,
+        )
+        raise PermissionError(
+            "Authentication required. Use the authenticated "
+            "application API to execute this tool."
         )
 
-        mcp_server.tool(
-            name=name,
-            description=description,
-        )(guarded_handler)
+    return guarded_handler
 
-        registered_count += 1
-        logger.info("Registered guarded MCP tool: %s", name)
 
-    return registered_count
+def register_all_tools() -> int:
+    """
+    Register every tool in TOOLS. Returns how many tools are registered.
+
+    Safe to call any number of times, from anywhere:
+      * uvicorn --reload, tests, lazy call from llm/agent.py
+      * even when this file is imported under TWO names
+        (``mcp_app.register_tools`` and ``chatbot_version_2.mcp_app.
+        register_tools``) - Python then holds two copies of this module, but
+        they share ONE registry, so we skip tools that are already there
+        instead of registering them twice.
+    """
+    with _lock:
+        for name, handler, description, role, permission in TOOLS:
+            if name in MCP_REGISTRY:
+                continue
+
+            register_mcp(
+                name=name,
+                handler=handler,
+                description=description,
+                role=role,
+                permission=permission,
+            )
+
+            # Same tool, exposed on the stdio MCP server - but locked.
+            mcp_server.tool(
+                name=name,
+                description=description,
+            )(_make_guarded_handler(name, handler))
+
+            logger.info("Registered MCP tool: %s", name)
+
+        return len(MCP_REGISTRY)

@@ -1,4 +1,5 @@
 
+from auth.rbac import has_permission
 from mcp_app.registry import get_mcp
 from src.logger import get_logger
 
@@ -32,9 +33,13 @@ def check_mcp_permission(
     registered_role = mcp.get("role")
     registered_permission = mcp.get("permission")
 
+    # 1) the tool belongs to exactly this role,
+    # 2) the permission matches the tool's registration,
+    # 3) the RBAC table (auth/rbac.py) really grants it to the role.
     allowed = (
         role == registered_role
         and permission == registered_permission
+        and has_permission(role, permission)
     )
 
     if not allowed:

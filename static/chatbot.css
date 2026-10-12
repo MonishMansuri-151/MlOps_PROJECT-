@@ -652,15 +652,70 @@
     }
 }
 
+/* ========================================
+   AUTH PANEL (login / register banner)
+======================================== */
+
 .sanjivni-auth-panel {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 12px 16px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--chat-border, #e5e7eb);
+    background: var(--chat-primary-light, #e8f5ef);
+    font-size: 13px;
+}
+
+/* While a form is open, let the panel take the full window height
+   so the Create-account button is never cut off. */
+.sanjivni-auth-panel:has(#sanjivni-logout[hidden]),
+.sanjivni-auth-panel:has(form:not([hidden])) {
+    flex: 1 1 auto;
+    background: #ffffff;
+}
+
+#sanjivni-auth-status {
+    color: var(--chat-text, #243b34);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+#sanjivni-auth-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* Logged in: compact one-line banner (status + Logout) */
+.sanjivni-auth-panel:has(#sanjivni-logout:not([hidden])) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 14px;
+}
+
+.sanjivni-auth-panel:has(#sanjivni-logout:not([hidden])) #sanjivni-auth-error:empty {
+    display: none;
+}
+
+.sanjivni-auth-panel h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
 }
 
 .sanjivni-auth-panel form {
     display: grid;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.sanjivni-auth-panel label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--chat-muted, #71817b);
 }
 
 .sanjivni-auth-panel input,
@@ -672,19 +727,56 @@
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     font: inherit;
+    background: #fff;
+}
+
+.sanjivni-auth-panel textarea {
+    min-height: 56px;
+    resize: vertical;
 }
 
 .sanjivni-auth-panel button {
     margin: 4px 6px 4px 0;
-    padding: 9px 13px;
+    padding: 9px 14px;
     border: 0;
     border-radius: 8px;
+    background: var(--chat-primary, #147d64);
+    color: #fff;
+    font-weight: 600;
     cursor: pointer;
 }
 
+.sanjivni-auth-panel button:hover {
+    background: var(--chat-primary-dark, #0d624e);
+}
+
+/* Secondary buttons (Back / Cancel / Logout) */
+#sanjivni-login-cancel,
+#sanjivni-register-cancel,
+#sanjivni-logout {
+    background: #eef2f0;
+    color: var(--chat-text, #243b34);
+}
+
+#sanjivni-login-cancel:hover,
+#sanjivni-register-cancel:hover,
+#sanjivni-logout:hover {
+    background: #dde6e1;
+}
+
+#sanjivni-logout {
+    margin: 0;
+    white-space: nowrap;
+}
+
 #sanjivni-auth-error {
+    margin: 6px 0 0;
     color: #b91c1c;
     font-size: 13px;
+}
+
+#sanjivni-auth-error:empty {
+    display: none;
 }
 
 [hidden] {

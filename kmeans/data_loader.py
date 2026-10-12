@@ -1,6 +1,15 @@
 import sys
+from pathlib import Path
 
-from chatbot.database.connection import get_connection
+# Support database connection whether chatbot_version_2 is root or imported
+try:
+    from database.connection import get_connection
+except ImportError:
+    _mcp_dir = str(Path(__file__).resolve().parent.parent / "chatbot_version_2")
+    if _mcp_dir not in sys.path:
+        sys.path.append(_mcp_dir)
+    from database.connection import get_connection
+
 from src.logger import get_logger
 from src.exception import CustomException
 logger = get_logger(__name__)

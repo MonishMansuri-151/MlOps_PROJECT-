@@ -65,6 +65,9 @@ const messageForm = document.getElementById("sanjivni-chat-form");
 
 let authenticatedUser = null;
 
+// Remember the original welcome message so it can be restored after logout/login
+const welcomeTemplate = messagesArea.cloneNode(true);
+
 function showAuthError(message) {
     authError.textContent = message || "";
 }
@@ -178,7 +181,9 @@ logoutButton.addEventListener("click", async () => {
     try {
         await authRequest("/logout", "POST");
         updateAuthUI(null);
-        messagesArea.replaceChildren();
+        messagesArea.replaceChildren(
+            ...Array.from(welcomeTemplate.children).map(n => n.cloneNode(true))
+        );
     } catch (error) {
         showAuthError(error.message);
     }
@@ -415,11 +420,14 @@ checkLoginStatus();
             });
 
             // Read the server's JSON response.
-            const result = await response.json();
+            // Server errors may not return JSON, so never let parsing crash.
+            const result = await response.json().catch(() => ({}));
 
             // Display a safe, understandable error for failed requests.
             if (!response.ok) {
                 if (response.status === 401) {
+                    // Session expired: show the login panel again.
+                    updateAuthUI(null);
                     throw new Error(
                         "Please log in to use the healthcare assistant."
                     );
@@ -480,6 +488,14 @@ checkLoginStatus();
         sendMessage(messageInput.value);
     });
 
+
+    // Enter sends, Shift+Enter makes a new line.
+    messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+            event.preventDefault();
+            chatForm.requestSubmit();
+        }
+    });
 
     // ----------------------------------------
     // 9. Automatically grow the text box

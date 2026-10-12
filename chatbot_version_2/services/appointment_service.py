@@ -4,6 +4,22 @@ from database.connection import get_db
 from src.logger import get_logger 
 logger = get_logger(__name__)
 
+
+def _to_time(value):
+    """
+    PyMySQL returns MySQL TIME columns as datetime.timedelta.
+    Convert to datetime.time so the code below can compare and add to it.
+    """
+    if isinstance(value, timedelta):
+        total = int(value.total_seconds())
+        hours, rest = divmod(total, 3600)
+        minutes, seconds = divmod(rest, 60)
+        return time(hours % 24, minutes, seconds)
+    if isinstance(value, datetime):
+        return value.time()
+    return value
+
+
 def get_available_slots(doctor_id: int, appointment_date: date):
     """
     Get available appointment slots for a doctor on a specific date.
@@ -25,6 +41,9 @@ def get_available_slots(doctor_id: int, appointment_date: date):
         return []
 
     if not appointment_date:
+        return []
+
+    if appointment_date < date.today():
         return []
 
     day_name = appointment_date.strftime("%A")
@@ -90,8 +109,8 @@ def get_available_slots(doctor_id: int, appointment_date: date):
     available_slots = []
 
     for schedule in schedules:
-        schedule_start = schedule["start_time"]
-        schedule_end = schedule["end_time"]
+        schedule_start = _to_time(schedule["start_time"])
+        schedule_end = _to_time(schedule["end_time"])
         slot_duration = schedule["slot_duration"]
 
         if not slot_duration or slot_duration <= 0:
@@ -105,14 +124,16 @@ def get_available_slots(doctor_id: int, appointment_date: date):
                 + timedelta(minutes=slot_duration)
             ).time()
 
-            if current_end > schedule_end:
+            # Stop at the end of the schedule (or if the time wrapped
+            # past midnight).
+            if current_end > schedule_end or current_end <= current_start:
                 break
 
             slot_available = True
 
             for appointment in booked_appointments:
-                booked_start = appointment["start_time"]
-                booked_end = appointment["end_time"]
+                booked_start = _to_time(appointment["start_time"])
+                booked_end = _to_time(appointment["end_time"])
 
                 # Overlap condition
                 if (
@@ -121,6 +142,13 @@ def get_available_slots(doctor_id: int, appointment_date: date):
                 ):
                     slot_available = False
                     break
+
+            # Today: hide slots whose start time has already passed.
+            if (
+                appointment_date == date.today()
+                and current_start <= datetime.now().time()
+            ):
+                slot_available = False
 
             if slot_available:
                 available_slots.append(
@@ -184,6 +212,15 @@ def book_appointment(
         return {
             "success": False,
             "message": "Appointment date and time are required.",
+        }
+
+    now = datetime.now()
+    if appointment_date < now.date() or (
+        appointment_date == now.date() and start_time <= now.time()
+    ):
+        return {
+            "success": False,
+            "message": "Appointments cannot be booked in the past.",
         }
 
     if end_time <= start_time:
@@ -299,8 +336,8 @@ def book_appointment(
 
             for schedule in schedules:
 
-                schedule_start = schedule["start_time"]
-                schedule_end = schedule["end_time"]
+                schedule_start = _to_time(schedule["start_time"])
+                schedule_end = _to_time(schedule["end_time"])
                 slot_duration = schedule["slot_duration"]
 
                 if (
@@ -323,7 +360,7 @@ def book_appointment(
                 }
 
             # Make sure the requested start time follows the slot interval.
-            schedule_start = valid_schedule["start_time"]
+            schedule_start = _to_time(valid_schedule["start_time"])
             slot_duration = valid_schedule["slot_duration"]
 
             minutes_from_start = (
@@ -501,7 +538,9 @@ def cancel_appointment(patient_id: int, appointment_id: int):
                 SELECT
                     id,
                     patient_id,
-                    status
+                    status,
+                    appointment_date,
+                    start_time
                 FROM appointments
                 WHERE id = %s
                 FOR UPDATE
@@ -528,9 +567,11 @@ def cancel_appointment(patient_id: int, appointment_id: int):
                     },
                 )
 
+                # Same answer as "not found": do not reveal that this id
+                # belongs to somebody else.
                 return {
                     "success": False,
-                    "message": "You are not allowed to cancel this appointment.",
+                    "message": "Appointment not found.",
                 }
 
             if appointment["status"] not in ("booked", "confirmed"):
@@ -538,6 +579,16 @@ def cancel_appointment(patient_id: int, appointment_id: int):
                     "success": False,
                     "message": "This appointment cannot be cancelled.",
                 }
+
+            # Past appointments are history; they cannot be cancelled.
+            when = appointment.get("appointment_date")
+            if when is not None:
+                start = _to_time(appointment.get("start_time")) or time(0, 0)
+                if datetime.combine(when, start) < datetime.now():
+                    return {
+                        "success": False,
+                        "message": "Past appointments cannot be cancelled.",
+                    }
 
             cursor.execute(
                 """
